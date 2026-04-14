@@ -37,5 +37,3 @@ build/
 # Logs & temporary files
 *.log
 *.tmp
-
-notifications.log

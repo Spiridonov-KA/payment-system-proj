@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta
-from fastapi import APIRouter, Depends
+from typing import List
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -39,3 +41,16 @@ def create_payment(payload: PaymentCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(db_payment)
     return db_payment
+
+@router.get("/", response_model=List[PaymentResponse])
+def list_payments(db: Session = Depends(get_db)):
+    stmt = select(Payment).order_by(Payment.created_at.desc())
+    return db.execute(stmt).scalars().all()
+
+@router.get("/{payment_id}", response_model=PaymentResponse)
+def get_payment(payment_id: int, db: Session = Depends(get_db)):
+    stmt = select(Payment).where(Payment.id == payment_id)
+    payment = db.execute(stmt).scalars().first()
+    if not payment:
+        raise HTTPException(status_code=404, detail="Payment not found")
+    return payment
