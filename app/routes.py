@@ -54,3 +54,30 @@ def get_payment(payment_id: int, db: Session = Depends(get_db)):
     if not payment:
         raise HTTPException(status_code=404, detail="Payment not found")
     return payment
+
+@router.post("/{payment_id}/refund", response_model=PaymentResponse)
+def refund_payment(payment_id: int, db: Session = Depends(get_db)):
+    stmt = select(Payment).where(Payment.id == payment_id)
+    payment = db.execute(stmt).scalars().first()
+    
+    if not payment:
+        raise HTTPException(status_code=404, detail="Payment not found")
+    
+    if payment.status != PaymentStatus.SUCCESS:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Cannot refund payment with status: {payment.status}"
+        )
+    
+    success, failure_reason = YooMoneyMockGateway.process_payment(payment.user_id, payment.amount)
+    
+    if success:
+        payment.status = PaymentStatus.REFUNDED
+        send_notification(payment.id, "REFUNDED")
+    else:
+        payment.failure_reason = f"Refund failed: {failure_reason}"
+        send_notification(payment.id, "REFUND_FAILED", failure_reason)
+        
+    db.commit()
+    db.refresh(payment)
+    return payment

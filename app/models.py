@@ -9,6 +9,7 @@ class PaymentStatus(str, enum.Enum):
     SUCCESS = "success"
     FAILED = "failed"
     RETRYING = "retrying"
+    REFUNDED = "refunded"
 
 class Payment(Base):
     __tablename__ = "payments"
