@@ -12,7 +12,7 @@ async def lifespan(app: FastAPI):
     yield
     stop_scheduler()
 
-app = FastAPI(title="Payment System", version="0.5.0", lifespan=lifespan)
+app = FastAPI(title="Payment System", version="0.6.0", lifespan=lifespan)
 app.include_router(payment_router)
 
 @app.exception_handler(Exception)

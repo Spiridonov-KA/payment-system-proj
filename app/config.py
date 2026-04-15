@@ -1,6 +1,15 @@
-import os
+from pydantic_settings import BaseSettings
+from pydantic import ConfigDict
+from pathlib import Path
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DATABASE_URL = f"sqlite:///{os.path.join(BASE_DIR, 'payments.db')}"
-NOTIFICATION_FILE = os.path.join(BASE_DIR, "notifications.log")
-RETRY_DELAY_HOURS = 24  # Повторная попытка через 1 день
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+class Settings(BaseSettings):
+    DATABASE_URL: str = f"sqlite:///{BASE_DIR / 'payments.db'}"
+    NOTIFICATION_FILE: str = str(BASE_DIR / "notifications.log")
+    RETRY_DELAY_HOURS: int = 24
+    SCHEDULER_INTERVAL_MINUTES: int = 1
+
+    model_config = ConfigDict(env_file=".env", case_sensitive=False)
+
+settings = Settings()
