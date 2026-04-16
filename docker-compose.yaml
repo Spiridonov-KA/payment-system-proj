@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  payment-api:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./payments.db:/app/payments.db
+      - ./notifications.log:/app/notifications.log
+      - ./.env:/app/.env
+    environment:
+      - DATABASE_URL=sqlite:///./payments.db
+      - NOTIFICATION_FILE=notifications.log
+      - RETRY_DELAY_HOURS=24
+      - SCHEDULER_INTERVAL_MINUTES=1
+    restart: unless-stopped
