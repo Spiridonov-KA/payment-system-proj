@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import Query
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -43,8 +44,16 @@ def create_payment(payload: PaymentCreate, db: Session = Depends(get_db)):
     return db_payment
 
 @router.get("/", response_model=List[PaymentResponse])
-def list_payments(db: Session = Depends(get_db)):
-    stmt = select(Payment).order_by(Payment.created_at.desc())
+def list_payments(
+    skip: int = Query(default=0, ge=0, description="Пропустить N записей"),
+    limit: int = Query(default=50, ge=1, le=100, description="Максимум записей"),
+    status: PaymentStatus | None = Query(None, description="Фильтр по статусу"),
+    db: Session = Depends(get_db)
+):
+    stmt = select(Payment)
+    if status:
+        stmt = stmt.where(Payment.status == status)
+    stmt = stmt.order_by(Payment.created_at.desc()).offset(skip).limit(limit)
     return db.execute(stmt).scalars().all()
 
 @router.get("/{payment_id}", response_model=PaymentResponse)
