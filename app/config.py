@@ -6,10 +6,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 class Settings(BaseSettings):
     DATABASE_URL: str = f"sqlite:///{BASE_DIR / 'payments.db'}"
-    NOTIFICATION_FILE: str = str(BASE_DIR / "notifications.log")
+    NOTIFICATION_FILE: str = "/app/logs/notifications.log"
     RETRY_DELAY_HOURS: int = 24
     SCHEDULER_INTERVAL_MINUTES: int = 1
 
-    model_config = ConfigDict(env_file=".env", case_sensitive=False)
+    model_config = ConfigDict(
+        env_file=str(BASE_DIR / ".env"),
+        case_sensitive=False
+    )
 
 settings = Settings()
