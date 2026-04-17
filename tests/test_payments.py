@@ -24,7 +24,6 @@ def setup_db():
     with SessionLocal() as db:
         db.query(Payment).delete()
         db.commit()
-    # Используем settings.NOTIFICATION_FILE вместо прямого импорта
     if os.path.exists(settings.NOTIFICATION_FILE):
         os.remove(settings.NOTIFICATION_FILE)
 

@@ -8,9 +8,4 @@ services:
     volumes:
       - ./payments.db:/app/payments.db
       - ./logs:/app/logs
-    environment:
-      - DATABASE_URL=sqlite:///./payments.db
-      - NOTIFICATION_FILE=/app/logs/notifications.log
-      - RETRY_DELAY_HOURS=24
-      - SCHEDULER_INTERVAL_MINUTES=1
     restart: unless-stopped

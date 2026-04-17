@@ -16,11 +16,36 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+## Конфигурация (.env)
+
+| Переменная | Значение по умолчанию | Описание |
+|------------|----------------------|----------|
+| `DATABASE_URL` | `sqlite:///./payments.db` | Строка подключения к БД |
+| `NOTIFICATION_FILE` | `/app/logs/notifications.log` | Путь к файлу логов уведомлений |
+| `RETRY_DELAY_HOURS` | `24` | Через сколько часов повторять неудачный платёж |
+| `SCHEDULER_INTERVAL_MINUTES` | `1` | Как часто планировщик проверяет просроченные платежи |
+
 ## Запуск
 
 ```bash
 # Создать .env при необходимости (см. .env.example)
 uvicorn app.main:app --reload
+```
+
+## Запуск через Docker
+
+```bash
+# Создать папку для логов (чтобы Docker не создал директорию вместо файла)
+mkdir -p logs
+
+# Сборка и запуск
+docker compose up --build -d
+
+# Просмотр логов приложения
+docker compose logs -f payment-api
+
+# Остановка
+docker compose down
 ```
 
 ## Тесты
